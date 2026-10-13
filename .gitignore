@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.streamlit/secrets.toml
+output/dashboard.png
+output/report.txt
+data/uploads/*.csv
+data/uploads/*.CSV
