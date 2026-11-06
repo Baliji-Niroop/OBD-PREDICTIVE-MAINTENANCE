@@ -48,3 +48,9 @@
 - [x] Reworked the main README for a quick first-time understanding.
 - [x] Added architecture, rule details, and progress notes.
 - [x] Added repo hygiene and project-entry improvements.
+
+## Phase 12 — Polish
+- [x] Expanded the synthetic demo dataset to five logs.
+- [x] Fixed anomaly-plot rendering when logs have no elapsed-time column.
+- [x] Added continuous integration tests.
+- [x] Added a changelog.

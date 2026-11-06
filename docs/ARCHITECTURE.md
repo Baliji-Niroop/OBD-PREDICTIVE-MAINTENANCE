@@ -2,6 +2,8 @@
 
 This project is a lightweight local analysis pipeline for OBD-II CSV exports. A CSV is read into a pandas DataFrame, supported columns are mapped to standard signals, rule-based checks are applied, health scores are computed, and the results are rendered either as a CLI report or a browser dashboard. The code is intentionally small and transparent so that a user can trace each stage from raw readings to a final health summary.
 
+For the verified rule thresholds and scoring cutoffs, see [HOW_IT_WORKS.md](HOW_IT_WORKS.md).
+
 | File | Responsibility | Key functions / symbols |
 |---|---|---|
 | [src/obd_predictive/obd_analysis.py](../src/obd_predictive/obd_analysis.py) | Core parsing, rule checks, scoring, anomaly detection, trend estimates | `load_log`, `match_columns`, `analyze_log`, `estimate_trends`, `build_report` |
