@@ -31,6 +31,15 @@ LIMITS = {
     "rpm_dip_below_local_median": 150.0,
 }
 
+# Minimum overall score labeled GOOD.
+GOOD_SCORE_MIN = 85
+# Minimum overall score labeled FAIR.
+FAIR_SCORE_MIN = 65
+# Expected share of complete rows marked unusual by Isolation Forest.
+ISOLATION_FOREST_CONTAMINATION = 0.03
+# Minimum complete rows required to fit the Isolation Forest model.
+ISOLATION_FOREST_MIN_ROWS = 50
+
 SIGNALS = {
     "rpm": ("Engine speed", "rpm", "RPM"),
     "coolant_c": ("Coolant temperature", "°C", "Coolant temperature"),
@@ -357,14 +366,17 @@ def _detect_anomalies(log: LogAnalysis) -> None:
     """Flag unusual multivariate sensor combinations when enough complete data is present."""
     features = [key for key in SIGNALS if key in log.frame and log.frame[key].notna().any()]
     usable = log.frame[features].dropna() if len(features) >= 2 else pd.DataFrame()
-    if len(features) < 2 or len(usable) < 50:
+    if len(features) < 2 or len(usable) < ISOLATION_FOREST_MIN_ROWS:
         log.anomalies = pd.Series(False, index=log.frame.index)
-        log.anomaly_note = f"Not run: requires at least 2 usable sensor types and 50 complete rows (found {len(features)} types, {len(usable)} rows)."
+        log.anomaly_note = (
+            f"Not run: requires at least 2 usable sensor types and {ISOLATION_FOREST_MIN_ROWS} "
+            f"complete rows (found {len(features)} types, {len(usable)} rows)."
+        )
         return
     from sklearn.ensemble import IsolationForest
 
     model = IsolationForest(
-        contamination=0.03,
+        contamination=ISOLATION_FOREST_CONTAMINATION,
         random_state=42,
         n_estimators=50,
         n_jobs=1,
@@ -466,7 +478,7 @@ def health_summary(log: LogAnalysis) -> tuple[int | None, str]:
     if not log.scores:
         return None, "Not scored (no supported sensor data)"
     score = round(sum(log.scores.values()) / len(log.scores))
-    label = "GOOD" if score >= 85 else "FAIR" if score >= 65 else "POOR"
+    label = "GOOD" if score >= GOOD_SCORE_MIN else "FAIR" if score >= FAIR_SCORE_MIN else "POOR"
     return score, label
 
 

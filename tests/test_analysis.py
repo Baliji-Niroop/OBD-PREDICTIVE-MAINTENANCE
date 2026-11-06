@@ -7,8 +7,10 @@ import tempfile
 import unittest
 
 from matplotlib.image import imread
+import pandas as pd
 
 from obd_predictive.obd_analysis import (
+    LogAnalysis,
     analyze_log,
     estimate_trends,
     health_summary,
@@ -60,6 +62,24 @@ class OBDAnalysisTests(unittest.TestCase):
         score, _ = health_summary(log)
         self.assertIsNone(score)
 
+    def test_health_summary_labels_and_unscored_message(self) -> None:
+        for value, label in ((85, "GOOD"), (84, "FAIR"), (65, "FAIR"), (64, "POOR")):
+            log = LogAnalysis(self.root / "scored.csv", pd.DataFrame(), {}, scores={"system": value})
+            self.assertEqual(health_summary(log), (value, label))
+
+        log = LogAnalysis(self.root / "unscored.csv", pd.DataFrame(), {})
+        self.assertEqual(health_summary(log), (None, "Not scored (no supported sensor data)"))
+
+    def test_bundled_logs_have_trends_and_expected_latest_score(self) -> None:
+        sample_dir = Path(__file__).resolve().parents[1] / "data" / "sample"
+        logs = [analyze_log(sample_dir / f"session_{number}.csv") for number in range(1, 6)]
+        trends = "\n".join(estimate_trends(logs, 30))
+
+        self.assertIn("Coolant peak", trends)
+        self.assertIn("Running voltage", trends)
+        self.assertIn("Fuel trim", trends)
+        self.assertEqual(health_summary(logs[-1]), (85, "GOOD"))
+
     def test_synthetic_csv_is_marked_as_demo_data(self) -> None:
         path = self.write_csv(
             "sample.csv",
@@ -79,9 +99,12 @@ class OBDAnalysisTests(unittest.TestCase):
         self.assertIn("about", trend)
 
     def test_fewer_than_three_logs_omit_projections(self) -> None:
-        log = analyze_log(self.write_csv("coolant.csv", "Coolant Temperature (°C)\n85\n"))
+        logs = [
+            analyze_log(self.write_csv(f"coolant-{index}.csv", "Coolant Temperature (°C)\n85\n"))
+            for index in range(2)
+        ]
         self.assertEqual(
-            estimate_trends([log], 30),
+            estimate_trends(logs, 30),
             ["Life estimates omitted: at least three logs are required."],
         )
 
