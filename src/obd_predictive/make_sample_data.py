@@ -10,14 +10,17 @@ ROOT = Path(__file__).resolve().parents[2]
 SAMPLE_DIR = ROOT / "data" / "sample"
 RNG = np.random.default_rng(7)
 SESSIONS = [
-    (90.0, 14.2, 1.5, 12, 0),
-    (93.0, 14.0, 3.5, 20, 0),
-    (96.0, 13.8, 6.0, 30, 3),
+    (88.0, 14.4, 0.5, 8, 0),
+    (91.0, 14.2, 2.0, 14, 1),
+    (95.0, 13.9, 4.5, 22, 2),
+    (100.0, 13.6, 8.0, 30, 3),
+    (105.0, 13.1, 12.0, 36, 5),
 ]
 SAMPLES = 900
 
 
 def make_session(coolant_steady: float, voltage: float, ltft: float, idle_noise: int, dips: int) -> pd.DataFrame:
+    """Build one synthetic OBD sample log with controlled health trends."""
     seconds = np.arange(SAMPLES)
     drive = np.clip((seconds - 120) / 60, 0, 1) * np.clip((780 - seconds) / 60, 0, 1)
     speed = drive * (45 + 25 * np.sin(seconds / 55.0) ** 2) + RNG.normal(0, 1.0, SAMPLES) * drive
@@ -47,6 +50,7 @@ def make_session(coolant_steady: float, voltage: float, ltft: float, idle_noise:
 
 
 def main() -> None:
+    """Generate the bundled sample CSV logs used for demonstration and testing."""
     print("Generating SYNTHETIC demonstration data only (not real vehicle measurements).")
     SAMPLE_DIR.mkdir(parents=True, exist_ok=True)
     for number, settings in enumerate(SESSIONS, start=1):
@@ -54,6 +58,7 @@ def main() -> None:
         frame = make_session(*settings)
         frame.to_csv(path, index=False)
         print(f"Wrote {path.name}: {len(frame)} synthetic rows")
+    print(f"Created {len(SESSIONS)} demo logs showing a gradual shift from healthy to more stressed conditions.")
 
 
 if __name__ == "__main__":

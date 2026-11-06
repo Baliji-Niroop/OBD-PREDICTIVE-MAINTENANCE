@@ -4,8 +4,15 @@ __pycache__/
 *.egg-info/
 build/
 dist/
+.pytest_cache/
+.ipynb_checkpoints/
+.DS_Store
+Thumbs.db
 .streamlit/secrets.toml
-output/dashboard.png
-output/report.txt
+.vscode/
+output/*
+!output/.gitkeep
+
 data/uploads/*.csv
 data/uploads/*.CSV
+!data/uploads/README.md

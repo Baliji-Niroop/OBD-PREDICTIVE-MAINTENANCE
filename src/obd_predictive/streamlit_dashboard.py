@@ -176,6 +176,7 @@ def _show_results(logs: list[LogAnalysis], report: str, dashboard_images: list[b
 
 
 def main() -> None:
+    """Run the local Streamlit app that loads demo or uploaded CSV logs."""
     st.set_page_config(
         page_title="OBD-II Vehicle Health",
         page_icon="🚘",

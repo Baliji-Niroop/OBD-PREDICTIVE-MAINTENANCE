@@ -120,6 +120,18 @@ class OBDAnalysisTests(unittest.TestCase):
         self.assertGreater(image.shape[0], 500)
         self.assertGreater(image.shape[1], 500)
 
+    def test_dashboard_renders_anomalies_without_elapsed_time(self) -> None:
+        rows = ["RPM,Coolant Temperature (°C)"]
+        rows.extend("750,80" for _ in range(99))
+        rows.append("5000,180")
+        log = analyze_log(self.write_csv("anomalies.csv", "\n".join(rows) + "\n"))
+        self.assertIsNotNone(log.anomalies)
+        self.assertTrue(log.anomalies.any())
+
+        image_path = self.root / "output" / "anomalies.png"
+        render_dashboard(log, image_path)
+        self.assertTrue(image_path.is_file())
+
 
 if __name__ == "__main__":
     unittest.main()

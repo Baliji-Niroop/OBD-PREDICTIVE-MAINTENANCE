@@ -67,7 +67,7 @@ def render_dashboard(log: LogAnalysis, output_path: Path) -> None:
             x = log.frame["elapsed_s"]
             x_label = "Elapsed time (s)"
         else:
-            x = range(len(log.frame))
+            x = log.frame.index.to_series(index=log.frame.index)
             x_label = "Sample"
         ax.plot(x, values, linewidth=1.0, color="#276fbf", label=SIGNALS[key][0])
         ax.set_title(SIGNALS[key][0], loc="left", fontsize=12, weight="bold")
@@ -77,8 +77,8 @@ def render_dashboard(log: LogAnalysis, output_path: Path) -> None:
         if log.anomalies is not None and log.anomalies.any():
             mask = log.anomalies.reindex(values.index, fill_value=False) & values.notna()
             if mask.any():
-                ax.scatter(x[mask] if hasattr(x, "__getitem__") else [i for i, selected in enumerate(mask) if selected],
-                           values[mask], color="#c1121f", s=26, marker="x", label="Anomaly", zorder=3)
+                ax.scatter(x[mask], values[mask], color="#c1121f", s=26, marker="x",
+                           label="Anomaly", zorder=3)
                 ax.legend(loc="best", fontsize=8)
     if not available:
         ax = fig.add_subplot(grid[2, :])

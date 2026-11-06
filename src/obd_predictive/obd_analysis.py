@@ -54,6 +54,8 @@ ALIASES = {
 
 @dataclass
 class Finding:
+    """Single rule-based finding with a severity and a short explanation."""
+
     system: str
     severity: str
     title: str
@@ -64,6 +66,8 @@ class Finding:
 
 @dataclass
 class LogAnalysis:
+    """Container for one CSV log after parsing, scoring, and summarization."""
+
     path: Path
     frame: pd.DataFrame
     source_columns: dict[str, str]
@@ -77,7 +81,10 @@ class LogAnalysis:
     synthetic: bool = False
 
 
+# --- Column matching and file loading
+
 def _norm(value: str) -> str:
+    """Normalize a CSV header so comparable names can be matched reliably."""
     return re.sub(r"[^a-z0-9]+", " ", value.lower()).strip()
 
 
@@ -111,6 +118,7 @@ def match_columns(columns: list[str]) -> tuple[dict[str, str], list[str]]:
 
 
 def _find_log_date(path: Path, frame: pd.DataFrame) -> date | None:
+    """Infer a log date from a filename or timestamp-like column when available."""
     match = re.search(r"(20\d{2})[-_](\d{2})[-_](\d{2})", path.stem)
     if match:
         try:
@@ -185,17 +193,22 @@ def load_log(path: Path) -> LogAnalysis:
 
 
 def _add(log: LogAnalysis, system: str, severity: str, title: str, evidence: str, explanation: str) -> None:
+    """Append a finding to the current log and convert severity to a penalty."""
     penalty = {"critical": 30, "warning": 15, "info": 5}.get(severity, 0)
     log.findings.append(Finding(system, severity, title, evidence, explanation, penalty))
 
 
 def _valid_values(log: LogAnalysis, key: str) -> pd.Series:
+    """Return only non-null values for one signal, or an empty series if absent."""
     if key not in log.frame:
         return pd.Series(dtype=float)
     return log.frame[key].dropna()
 
 
+# --- Rule-based diagnosis helpers
+
 def _diagnose_cooling(log: LogAnalysis) -> None:
+    """Check the log for overheating or underheat conditions in the coolant signal."""
     values = _valid_values(log, "coolant_c")
     if values.empty:
         return
@@ -220,6 +233,7 @@ def _diagnose_cooling(log: LogAnalysis) -> None:
 
 
 def _diagnose_charging(log: LogAnalysis) -> None:
+    """Review voltage readings for running, cranking, and resting electrical issues."""
     voltage = _valid_values(log, "voltage_v")
     if voltage.empty:
         return
@@ -267,6 +281,7 @@ def _diagnose_charging(log: LogAnalysis) -> None:
 
 
 def _diagnose_fuel(log: LogAnalysis) -> None:
+    """Check combined fuel-trim behavior for lean or rich correction patterns."""
     trims = [key for key in ("stft_pct", "ltft_pct") if key in log.frame]
     if not trims:
         return
@@ -285,6 +300,7 @@ def _diagnose_fuel(log: LogAnalysis) -> None:
 
 
 def _diagnose_engine(log: LogAnalysis) -> None:
+    """Assess idle speed quality and repeated RPM dips for rough-running patterns."""
     rpm = _valid_values(log, "rpm")
     if rpm.empty:
         return
@@ -320,6 +336,7 @@ def _diagnose_engine(log: LogAnalysis) -> None:
 
 
 def _score(log: LogAnalysis) -> None:
+    """Turn the collected findings into 0-100 system scores for usable sensors."""
     systems = {
         "Cooling": "coolant_c",
         "Charging / Battery": "voltage_v",
@@ -337,6 +354,7 @@ def _score(log: LogAnalysis) -> None:
 
 
 def _detect_anomalies(log: LogAnalysis) -> None:
+    """Flag unusual multivariate sensor combinations when enough complete data is present."""
     features = [key for key in SIGNALS if key in log.frame and log.frame[key].notna().any()]
     usable = log.frame[features].dropna() if len(features) >= 2 else pd.DataFrame()
     if len(features) < 2 or len(usable) < 50:
@@ -363,6 +381,7 @@ def _detect_anomalies(log: LogAnalysis) -> None:
 
 
 def analyze_log(path: Path) -> LogAnalysis:
+    """Run the complete OBD screening pipeline for a single CSV log."""
     log = load_log(path)
     _diagnose_cooling(log)
     _diagnose_charging(log)
@@ -374,6 +393,7 @@ def analyze_log(path: Path) -> LogAnalysis:
 
 
 def _trend_value(log: LogAnalysis, parameter: str) -> float | None:
+    """Return the latest scalar value needed for a simple warning-limit trend estimate."""
     if parameter == "coolant":
         return log.metrics.get("coolant_peak_c")
     if parameter == "voltage":
@@ -442,6 +462,7 @@ def estimate_trends(logs: list[LogAnalysis], interval_days: float | None) -> lis
 
 
 def health_summary(log: LogAnalysis) -> tuple[int | None, str]:
+    """Compute the rounded overall health value and a simple GOOD/FAIR/POOR label."""
     if not log.scores:
         return None, "Not scored (no supported sensor data)"
     score = round(sum(log.scores.values()) / len(log.scores))
@@ -454,6 +475,7 @@ def build_report(
     failed_inputs: list[str],
     interval_days: float | None,
 ) -> str:
+    """Create the plain-language text summary used by the CLI and the dashboard."""
     latest = logs[-1]
     lines = [
         "OBD-II PREDICTIVE MAINTENANCE AND FAULT DIAGNOSIS",

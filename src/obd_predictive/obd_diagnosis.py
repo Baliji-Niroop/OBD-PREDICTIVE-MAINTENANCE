@@ -14,6 +14,7 @@ from .obd_dashboard import render_dashboard
 
 
 def parse_args() -> argparse.Namespace:
+    """Parse the CLI arguments for the diagnosis workflow and validate interval settings."""
     parser = argparse.ArgumentParser(
         description="Analyze OBD-II CSV logs and create a health dashboard and plain-language report."
     )
@@ -33,6 +34,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def main() -> int:
+    """Run the command-line analysis over one or more CSV logs and save the outputs."""
     args = parse_args()
     logs = []
     failures = []

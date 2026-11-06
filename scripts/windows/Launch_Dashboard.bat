@@ -18,7 +18,7 @@ if errorlevel 1 (
     exit /b 1
 )
 
-python -m streamlit run "%PROJECT_ROOT%\app.py"
+python -m streamlit run "%PROJECT_ROOT%\app.py" --server.headless false
 if errorlevel 1 (
     echo The dashboard stopped with an error. Run scripts\windows\Setup_Update_And_Run.bat to repair or update it.
     pause

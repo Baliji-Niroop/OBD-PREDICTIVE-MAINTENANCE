@@ -8,6 +8,19 @@ version = "1.0.0"
 description = "Explainable OBD-II health screening, fault findings, and interactive dashboard"
 readme = "README.md"
 requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Baliji Niroop" }]
+keywords = ["obd", "automotive", "diagnostic", "dashboard", "streamlit"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+    "Topic :: Scientific/Engineering :: Visualization",
+]
 dependencies = [
     "pandas",
     "numpy",
@@ -17,9 +30,21 @@ dependencies = [
     "plotly",
 ]
 
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[project.urls]
+Homepage = "https://github.com/Baliji-Niroop/OBD-PREDICTIVE-MAINTENANCE"
+Repository = "https://github.com/Baliji-Niroop/OBD-PREDICTIVE-MAINTENANCE"
+Issues = "https://github.com/Baliji-Niroop/OBD-PREDICTIVE-MAINTENANCE/issues"
+
 [project.scripts]
 obd-diagnosis = "obd_predictive.obd_diagnosis:main"
 obd-make-samples = "obd_predictive.make_sample_data:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
