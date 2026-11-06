@@ -18,15 +18,29 @@ This project helps a user review OBD-II CSV logs from a car without needing a fu
 
 ## Demo
 
-![Dashboard](docs/images/dashboard.png)
+![Interactive Streamlit dashboard](docs/images/streamlit-dashboard.png)
 
-![CLI report](docs/images/cli-report.png)
+*Interactive Streamlit dashboard*
+
+![Static dashboard image](docs/images/dashboard.png)
+
+*Static dashboard image (exported by the CLI and from the app)*
+
+![CLI text report](docs/images/cli-report.png)
+
+*CLI text report*
+
+Screenshots use the bundled synthetic demo data, not a real vehicle.
 
 ## Quick start
 
 ### Windows
 
 Double-click `Run_Dashboard.bat` in the project folder to start the local dashboard.
+
+First run installs everything automatically and needs internet.
+
+Other helpers: `scripts/windows/Setup_Update_And_Run.bat` (repair/update) and `scripts/windows/Create_Desktop_Shortcuts.ps1` (desktop shortcuts).
 
 ### Windows / Mac / Linux manual
 
@@ -84,6 +98,10 @@ This flow is described in more detail in [docs/ARCHITECTURE.md](docs/ARCHITECTUR
 
 Systems are scored separately and then averaged. Health = average of the supported systems only; missing systems are excluded rather than treated as healthy.
 
+Overall labels: GOOD = overall score >= 85, FAIR = >= 65, POOR = below 65.
+
+The label comes only from the average score, so a log can show a few warnings and still be GOOD.
+
 ## Supported sensors
 
 Headers are matched case-insensitively and accept common punctuation and naming variants from tools such as Torque Pro, Car Scanner, and OBD Fusion.
@@ -119,9 +137,10 @@ Known limitations / future ideas:
 ## Project structure
 
 ```text
-OBD-II-PREDICTIVE-MAINTENANCE/
+OBD-PREDICTIVE-MAINTENANCE/
 ├── app.py                          # Streamlit entry point
 ├── README.md                      # Main project guide and setup notes
+├── CHANGELOG.md                   # Release and project updates
 ├── LICENSE                        # MIT license for the project
 ├── requirements.txt               # Single dependency source: editable install
 ├── pyproject.toml                 # Package metadata, scripts, and pytest config
@@ -133,9 +152,10 @@ OBD-II-PREDICTIVE-MAINTENANCE/
 │   ├── ARCHITECTURE.md            # High-level design and data flow
 │   ├── HOW_IT_WORKS.md            # Rule thresholds and sensor handling
 │   ├── PROGRESS.md                # Milestone timeline of the project
-│   └── images/                   # Demo screenshots and .gitkeep placeholder
+│   └── images/                   # Demo screenshots
 ├── output/                        # Generated dashboard and report output
 ├── scripts/windows/              # Helper scripts for Windows setup and launch
+├── .github/workflows/tests.yml    # GitHub Actions test workflow
 ├── src/obd_predictive/            # Core analysis logic, dashboard renderer, and CLI
 │   ├── __init__.py                # Package version metadata
 │   ├── make_sample_data.py        # Generates synthetic demo CSVs
@@ -159,20 +179,25 @@ python -m unittest discover -s tests -v
 
 ## Troubleshooting
 
-Q: Setup fails on a fresh machine?
-A: Recreate the virtual environment and run `pip install -e .` before using the app.
+**Setup fails on a fresh machine?**
 
-Q: `ModuleNotFoundError: obd_predictive`?
-A: Install the package in editable mode with `python -m pip install -e .`.
+Recreate the virtual environment and run `pip install -e .` before using the app.
 
-Q: My CSV is malformed or empty?
-A: Check the header names and ensure the file is a real CSV with numeric values in supported columns.
+**`ModuleNotFoundError: obd_predictive`?**
 
-Q: No trend is shown?
-A: At least three logs with increasing dates or a supplied interval are required for trend estimates.
+Install the package in editable mode with `python -m pip install -e .`.
 
-Q: Streamlit says port 8501 is already in use?
-A: Stop the existing local process or start the app on a different port with `streamlit run app.py --server.port 8502`.
+**My CSV is malformed or empty?**
+
+Check the header names and ensure the file is a real CSV with numeric values in supported columns.
+
+**No trend is shown?**
+
+At least three logs with increasing dates or a supplied interval are required for trend estimates.
+
+**Streamlit says port 8501 is already in use?**
+
+Stop the existing local process or start the app on a different port with `streamlit run app.py --server.port 8502`.
 
 ## Author
 
