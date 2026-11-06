@@ -182,6 +182,48 @@ def main() -> None:
         page_icon="🚘",
         layout="wide",
     )
+    st.markdown(
+        """
+        <style>
+        .stApp { background: linear-gradient(180deg, #eaf3f2 0, #f3f6f7 300px); }
+        .block-container { max-width: 1440px; padding: 2rem 2rem 3rem; }
+        header[data-testid="stHeader"] { background: transparent; }
+        .dashboard-kicker {
+            color: #0f766e; font-size: .75rem; font-weight: 750;
+            letter-spacing: .12em; margin: .5rem 0 .4rem;
+        }
+        h1 { color: #18313b; font-size: 2.6rem; letter-spacing: -.045em; }
+        h2, h3 { color: #18313b; letter-spacing: -.025em; }
+        [data-testid="stMetric"] {
+            background: #fff; border: 1px solid #dce7e8; border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(24, 49, 59, .06); padding: .85rem .75rem;
+        }
+        [data-testid="stMetricLabel"] p {
+            color: #61747b; font-size: .74rem; font-weight: 650;
+        }
+        [data-testid="stMetricValue"] {
+            color: #18313b; font-size: 1.45rem; line-height: 1.15; white-space: nowrap;
+        }
+        [data-testid="stAlert"], [data-testid="stExpander"] {
+            border-radius: 14px;
+        }
+        .stTabs [data-baseweb="tab-list"] { gap: .45rem; border-bottom-color: #dce7e8; }
+        .stTabs [data-baseweb="tab"] { border-radius: 10px 10px 0 0; }
+        div[data-testid="stButton"] > button {
+            border-radius: 10px; font-weight: 650; min-height: 2.7rem;
+        }
+        div[data-testid="stTextInput"] input, div[data-testid="stNumberInput"] input {
+            border-radius: 10px;
+        }
+        @media (max-width: 700px) {
+            .block-container { padding: 1.2rem 1rem 2rem; }
+            h1 { font-size: 2rem; }
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+    st.markdown('<div class="dashboard-kicker">LOCAL OBD-II · VEHICLE HEALTH SCREENING</div>', unsafe_allow_html=True)
     st.title("OBD-II Predictive Maintenance Dashboard")
     st.write("Upload OBD-II CSV logs to review health scores, evidence-based findings, sensor trends, and unusual readings.")
     st.caption("Screening aid only — sensor readings cannot confirm mechanical faults. Check vehicle-specific service data.")
