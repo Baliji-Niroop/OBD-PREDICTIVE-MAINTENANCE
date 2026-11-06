@@ -2,7 +2,7 @@
 
 A simple local screening tool for OBD-II CSV logs. It reads exported vehicle data, highlights health trends, and flags rule-based warnings with plain-English explanations. It is a screening aid, not a confirmed diagnosis.
 
-[![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue)](https://www.python.org/) [![License: MIT](https://img.shields.io/badge/License-MIT-green)](LICENSE) [![Built with Streamlit](https://img.shields.io/badge/Built%20with-Streamlit-FF4B4B)](https://streamlit.io/)
+[![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue)](https://www.python.org/) [![License: MIT](https://img.shields.io/badge/License-MIT-green)](LICENSE) [![Built with Streamlit](https://img.shields.io/badge/Built%20with-Streamlit-FF4B4B)](https://streamlit.io/) [![Tests](https://github.com/Baliji-Niroop/OBD-PREDICTIVE-MAINTENANCE/actions/workflows/tests.yml/badge.svg)](https://github.com/Baliji-Niroop/OBD-PREDICTIVE-MAINTENANCE/actions)
 
 ## What is this?
 
